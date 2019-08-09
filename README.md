@@ -4,8 +4,9 @@ git checkout 2b0125a5c163828d4fb499bd199296f2ab3eafe2
 python3 train-2.py
 ```
 # 测试模型
-``
+```
 python3 demo-2.py
+
 ```
 
 # What is wrong with scene text recognition model comparisons? dataset and model analysis
