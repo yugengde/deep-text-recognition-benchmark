@@ -3,6 +3,10 @@
 git checkout 2b0125a5c163828d4fb499bd199296f2ab3eafe2
 python3 train-2.py
 ```
+# 测试模型
+``
+python3 demo-2.py
+```
 
 # What is wrong with scene text recognition model comparisons? dataset and model analysis
 | [paper](https://arxiv.org/abs/1904.01906) | [training and evaluation data](https://github.com/clovaai/deep-text-recognition-benchmark#download-lmdb-dataset-for-traininig-and-evaluation-from-here) | [failure cases and cleansed label](https://github.com/clovaai/deep-text-recognition-benchmark#download-failure-cases-and-cleansed-label-from-here) | [pretrained model](https://drive.google.com/drive/folders/15WPsuPJDCzhp2SvYZLRj8mAlT3zmoAMW) | [Baidu ver(passwd:rryk)](https://pan.baidu.com/s/1KSNLv4EY3zFWHpBYlpFCBQ) |
