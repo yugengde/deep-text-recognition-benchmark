@@ -1,6 +1,6 @@
-# 修改数据集训练代码
+# 使用lmdb数据集训练代码
 ```
-git checkout 2b0125a5c163828d4fb499bd199296f2a
+git checkout 2b0125a5c163828d4fb499bd199296f2ab3eafe2
 python3 train-2.py
 ```
 
