@@ -110,7 +110,7 @@ def hierarchical_dataset(root, opt, select_data='/'):
 
 class LmdbDataset(Dataset):
 
-    def __init__(self, root, opt):
+    def __init__(self, root, opt, transform=None):
 
         self.root = root
         self.opt = opt
@@ -148,6 +148,7 @@ class LmdbDataset(Dataset):
                     self.filtered_index_list.append(index)
 
                 self.nSamples = len(self.filtered_index_list)
+        self.transform = transform
 
     def __len__(self):
         return self.nSamples
@@ -187,6 +188,8 @@ class LmdbDataset(Dataset):
             out_of_char = f'[^{self.opt.character}]'
             label = re.sub(out_of_char, '', label)
 
+            if self.transform is not None:
+                img = self.transform(img)
         return (img, label)
 
 
