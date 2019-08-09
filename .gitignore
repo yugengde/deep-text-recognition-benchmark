@@ -11,6 +11,8 @@
 *.zip
 *.eps
 *.pdf
+**/lmdb/*
+lmdb*
 
 ### Linux ###
 *~
@@ -206,3 +208,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+tags
