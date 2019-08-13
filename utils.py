@@ -30,6 +30,7 @@ class CTCLabelConverter(object):
         text = ''.join(text)
         text = [self.dict[char] for char in text]
 
+        # batch中所有的text的对于的索引: [index, index, ..., index] , batch中每一个图片标签的长度: [10, 8]
         return (torch.IntTensor(text).to(device), torch.IntTensor(length).to(device))
 
     def decode(self, text_index, length):
