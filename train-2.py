@@ -62,6 +62,7 @@ def train(opt):
 
     # weight initialization
     for name, param in model.named_parameters():
+        print(name, param)
         if 'localization_fc2' in name:
             print(f'Skip {name} as it is already initialized')
             continue
@@ -135,12 +136,10 @@ def train(opt):
             # train part
         for image_tensors, labels in train_loader:
             image = image_tensors.to(device)
-            text, length = converter.encode(labels, batch_max_length=opt.batch_max_length)
+            text, length = converter.encode(labels, batch_max_length=opt.batch_max_length) # text: [index, index, ..., index], length: [10, 8]
             batch_size = image.size(0)
 
             if 'CTC' in opt.Prediction:
-                # import pdb; pdb.set_trace()
-                # preds = model(image.float(), text).log_softmax(2)
                 preds = model(image, text).log_softmax(2)
                 preds_size = torch.IntTensor([preds.size(1)] * batch_size).to(device)
                 preds = preds.permute(1, 0, 2)  # to use CTCLoss format
