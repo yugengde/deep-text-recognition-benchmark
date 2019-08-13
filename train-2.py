@@ -62,7 +62,6 @@ def train(opt):
 
     # weight initialization
     for name, param in model.named_parameters():
-        print(name, param)
         if 'localization_fc2' in name:
             print(f'Skip {name} as it is already initialized')
             continue
@@ -76,7 +75,6 @@ def train(opt):
                 param.data.fill_(1)
             continue
 
-    # data parallel for multi-GPU
     model = model.to(device)
     model.train()
     if opt.continue_model != '':
