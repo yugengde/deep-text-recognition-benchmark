@@ -5,6 +5,7 @@ class BidirectionalLSTM(nn.Module):
 
     def __init__(self, input_size, hidden_size, output_size):
         super(BidirectionalLSTM, self).__init__()
+        # input_size: 输入Xt的特征维度(batch, seq, feature)
         self.rnn = nn.LSTM(input_size, hidden_size, bidirectional=True, batch_first=True)
         self.linear = nn.Linear(hidden_size * 2, output_size)
 
