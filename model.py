@@ -30,15 +30,16 @@ class Model(nn.Module):
         self.stages = {'Trans': opt.Transformation, 'Feat': opt.FeatureExtraction,
                        'Seq': opt.SequenceModeling, 'Pred': opt.Prediction}
 
-        """ Transformation """
+        """ 1. 空间转换层: Transformation """
         if opt.Transformation == 'TPS':
-            self.Transformation = TPS_SpatialTransformerNetwork(
-                F=opt.num_fiducial, I_size=(opt.imgH, opt.imgW), I_r_size=(opt.imgH, opt.imgW), I_channel_num=opt.input_channel)
+            self.Transformation = TPS_SpatialTransformerNetwork(    # Spatial: 空间
+                F=opt.num_fiducial, I_size=(opt.imgH, opt.imgW), I_r_size=(opt.imgH, opt.imgW), I_channel_num=opt.input_channel)    # fiducial 基准
         else:
             print('No Transformation module specified')
 
-        """ FeatureExtraction """
+        """ 2. 特征抽取层: FeatureExtraction """
         if opt.FeatureExtraction == 'VGG':
+            # opt.input_channel: 输入图片的深度 depth
             self.FeatureExtraction = VGG_FeatureExtractor(opt.input_channel, opt.output_channel)
         elif opt.FeatureExtraction == 'RCNN':
             self.FeatureExtraction = RCNN_FeatureExtractor(opt.input_channel, opt.output_channel)
@@ -46,10 +47,10 @@ class Model(nn.Module):
             self.FeatureExtraction = ResNet_FeatureExtractor(opt.input_channel, opt.output_channel)
         else:
             raise Exception('No FeatureExtraction module specified')
-        self.FeatureExtraction_output = opt.output_channel  # int(imgH/16-1) * 512
+        self.FeatureExtraction_output = opt.output_channel  # int(imgH/16-1) * 512   opt.output_channel: default 512
         self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d((None, 1))  # Transform final (imgH/16-1) -> 1
 
-        """ Sequence modeling"""
+        """ 3. 序列模型层: Sequence modeling"""
         if opt.SequenceModeling == 'BiLSTM':
             self.SequenceModeling = nn.Sequential(
                 BidirectionalLSTM(self.FeatureExtraction_output, opt.hidden_size, opt.hidden_size),
@@ -59,7 +60,7 @@ class Model(nn.Module):
             print('No SequenceModeling module specified')
             self.SequenceModeling_output = self.FeatureExtraction_output
 
-        """ Prediction """
+        """ 4. 预测层: Prediction """
         if opt.Prediction == 'CTC':
             self.Prediction = nn.Linear(self.SequenceModeling_output, opt.num_class)
         elif opt.Prediction == 'Attn':
@@ -85,6 +86,7 @@ class Model(nn.Module):
 
         """ Prediction stage """
         if self.stages['Pred'] == 'CTC':
+            # contiguous 连续的 https://stackoverflow.com/questions/48915810/pytorch-contiguous
             prediction = self.Prediction(contextual_feature.contiguous())
         else:
             prediction = self.Prediction(contextual_feature.contiguous(), text, is_train, batch_max_length=self.opt.batch_max_length)
