@@ -22,7 +22,7 @@ from modules.sequence_modeling import BidirectionalLSTM
 from modules.prediction import Attention
 
 
-class Model(nn.Module):
+class Model(nn.Module):  # torch.Size([batch, 1, 32, 256])
 
     def __init__(self, opt):
         super(Model, self).__init__()
@@ -39,8 +39,8 @@ class Model(nn.Module):
 
         """ 2. 特征抽取层: FeatureExtraction """
         if opt.FeatureExtraction == 'VGG':
-            # opt.input_channel: 输入图片的深度 depth
-            self.FeatureExtraction = VGG_FeatureExtractor(opt.input_channel, opt.output_channel)
+            # opt.input_channel: 输入图片的深度 depth,  opt.output_channel: 512
+            self.FeatureExtraction = VGG_FeatureExtractor(opt.input_channel, opt.output_channel)  # out: batch, 512, 1, 24
         elif opt.FeatureExtraction == 'RCNN':
             self.FeatureExtraction = RCNN_FeatureExtractor(opt.input_channel, opt.output_channel)
         elif opt.FeatureExtraction == 'ResNet':
@@ -48,12 +48,13 @@ class Model(nn.Module):
         else:
             raise Exception('No FeatureExtraction module specified')
         self.FeatureExtraction_output = opt.output_channel  # int(imgH/16-1) * 512   opt.output_channel: default 512
+        # 512是特征长度, 24是序列长度
         self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d((None, 1))  # Transform final (imgH/16-1) -> 1
 
         """ 3. 序列模型层: Sequence modeling"""
         if opt.SequenceModeling == 'BiLSTM':
             self.SequenceModeling = nn.Sequential(
-                BidirectionalLSTM(self.FeatureExtraction_output, opt.hidden_size, opt.hidden_size),
+                BidirectionalLSTM(self.FeatureExtraction_output, opt.hidden_size, opt.hidden_size),  # 序列特征长度: 512, 隐藏: 256, 输出层: 256
                 BidirectionalLSTM(opt.hidden_size, opt.hidden_size, opt.hidden_size))
             self.SequenceModeling_output = opt.hidden_size
         else:
