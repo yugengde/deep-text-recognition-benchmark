@@ -138,14 +138,17 @@ def train(opt):
             batch_size = image.size(0)
 
             if 'CTC' in opt.Prediction:
+                # set xx = model(image, text) torch.Size([100, 63, 7]), xx.log_softmax(2)[0][0] = xx[0][0].log_softmax(-1)
                 preds = model(image, text).log_softmax(2) # torch.Size([100, 63, 12])
+                import pdb; pdb.set_trace()
                 preds_size = torch.IntTensor([preds.size(1)] * batch_size).to(device)
                 preds = preds.permute(1, 0, 2)  # to use CTCLoss format
 
                 # To avoid ctc_loss issue, disabled cudnn for the computation of the ctc_loss
                 # https://github.com/jpuigcerver/PyLaia/issues/16
                 torch.backends.cudnn.enabled = False
-                cost = criterion(preds, text, preds_size, length)
+                cost = criterion(preds, text, preds_size, length)  # preds.shape: torch.Size([63, 100, 7]), 其中63是序列特征，100是batch_size, 7是输出类别数量; text.shape: torch.Size([1000]), 表示1000个字符
+                # preds_size: 100, length: [10, 10, ..., 10] 长度为100,数组中的每个10表示每个标签的长度,意思就是每一张图片有10个字符
                 torch.backends.cudnn.enabled = True
 
             else:
