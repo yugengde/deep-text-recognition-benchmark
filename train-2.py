@@ -114,7 +114,7 @@ def train(opt):
         opt_log = '------------ Options -------------\n'
         args = vars(opt)
         for k, v in args.items():
-            opt_log += '{str(k)}: {str(v)}\n'
+            opt_log += f'{str(k)}: {str(v)}\n'
         opt_log += '---------------------------------------\n'
         print(opt_log)
         opt_file.write(opt_log)
@@ -181,8 +181,8 @@ def train(opt):
                         if 'Attn' in opt.Prediction:
                             pred = pred[:pred.find('[s]')]
                             gt = gt[:gt.find('[s]')]
-                        print('{pred:20s}, gt: {gt:20s},   {str(pred == gt)}')
-                        log.write('{pred:20s}, gt: {gt:20s},   {str(pred == gt)}\n')
+                        print(f'{pred:20s}, gt: {gt:20s},   {str(pred == gt)}')
+                        log.write(f'{pred:20s}, gt: {gt:20s},   {str(pred == gt)}\n')
 
                     valid_log = '[{i}/{opt.num_iter}] valid loss: {valid_loss:0.5f}'
                     valid_log += ' accuracy: {current_accuracy:0.3f}, norm_ED: {current_norm_ED:0.2f}'
