@@ -71,7 +71,6 @@ def demo(opt):
             print('image_path\tpredicted_labels')
             print('-' * 80)
             for img_name, pred in zip(image_path_list, preds_str):
-                import pdb; pdb.set_trace()
                 if 'Attn' in opt.Prediction:
                     pred = pred[:pred.find('[s]')]  # prune after "end of sentence" token ([s])
 
@@ -89,25 +88,25 @@ if __name__ == '__main__':
     parser.add_argument('--image_folder', default="demo_image/", help='path to image_folder which contains text images')
     parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
     parser.add_argument('--batch_size', type=int, default=192, help='input batch size')
-    parser.add_argument('--saved_model', default="saved_models/None-VGG-None-CTC-Seed1111/best_accuracy.pth", help="path to saved_model to evaluation")
+    parser.add_argument('--saved_model', default="saved_models/None-VGG-BiLSTM-CTC-Seed1111/best_accuracy.pth", help="path to saved_model to evaluation")
     """ Data processing """
     parser.add_argument('--batch_max_length', type=int, default=25, help='maximum-label-length')
     parser.add_argument('--imgH', type=int, default=32, help='the height of the input image')
     parser.add_argument('--imgW', type=int, default=100, help='the width of the input image')
     parser.add_argument('--rgb', action='store_true', help='use rgb input')
-    parser.add_argument('--character', type=str, default='0123456789x', help='character label')
+    parser.add_argument('--character', type=str, default='012345', help='character label')
     parser.add_argument('--sensitive', action='store_true', help='for sensitive character mode')
     parser.add_argument('--PAD', action='store_true', help='whether to keep ratio then pad for image resize')
     """ Model Architecture """
     parser.add_argument('--Transformation', type=str, default="None", help='Transformation stage. None|TPS')
     parser.add_argument('--FeatureExtraction', type=str, default="VGG", help='FeatureExtraction stage. VGG|RCNN|ResNet')
-    parser.add_argument('--SequenceModeling', type=str, default="None", help='SequenceModeling stage. None|BiLSTM')
+    parser.add_argument('--SequenceModeling', type=str, default="BiLSTM", help='SequenceModeling stage. None|BiLSTM')
     parser.add_argument('--Prediction', type=str, default="CTC", help='Prediction stage. CTC|Attn')
     parser.add_argument('--num_fiducial', type=int, default=20, help='number of fiducial points of TPS-STN')
     parser.add_argument('--input_channel', type=int, default=1, help='the number of input channel of Feature extractor')
     parser.add_argument('--output_channel', type=int, default=512,
                         help='the number of output channel of Feature extractor')
-    parser.add_argument('--hidden_size', type=int, default=512, help='the size of the LSTM hidden state')
+    parser.add_argument('--hidden_size', type=int, default=256, help='the size of the LSTM hidden state')
 
     opt = parser.parse_args()
 
