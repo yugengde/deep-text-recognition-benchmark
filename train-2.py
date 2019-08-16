@@ -29,24 +29,24 @@ class ToTensor(object):
         return sample.view(1,h, w).float()
 
 def train(opt):
-    """ dataset preparation """
+    """ 准备训练和验证的数据集 """
     transform = transforms.Compose([ToTensor(),])
     train_dataset = LmdbDataset(opt.train_data, opt=opt, transform=transform)
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=opt.batch_size,
-        shuffle=True,  # 'True' to check training progress with validation function.
+        shuffle=True,
         num_workers=int(opt.workers),
         )
 
     valid_dataset = LmdbDataset(root=opt.valid_data, opt=opt, transform=transform)
     valid_loader = torch.utils.data.DataLoader(
         valid_dataset, batch_size=opt.batch_size,
-        shuffle=True,  # 'True' to check training progress with validation function.
+        shuffle=True,
         num_workers=int(opt.workers),
         )
     print('-' * 80)
 
-    """ model configuration """
+    """ 模型的配置 """
     if 'CTC' in opt.Prediction:
         converter = CTCLabelConverter(opt.character)
     else:
@@ -60,10 +60,10 @@ def train(opt):
           opt.hidden_size, opt.num_class, opt.batch_max_length, opt.Transformation, opt.FeatureExtraction,
           opt.SequenceModeling, opt.Prediction)
 
-    # weight initialization
+    # 权重初始化
     for name, param in model.named_parameters():
         if 'localization_fc2' in name:
-            print(f'Skip {name} as it is already initialized')
+            print('Skip {name} as it is already initialized')
             continue
         try:
             if 'bias' in name:
@@ -78,7 +78,7 @@ def train(opt):
     model = model.to(device)
     model.train()
     if opt.continue_model != '':
-        print(f'loading pretrained model from {opt.continue_model}')
+        print('loading pretrained model from {opt.continue_model}')
         model.load_state_dict(torch.load(opt.continue_model))
     print("Model:")
     print(model)
@@ -110,11 +110,11 @@ def train(opt):
 
     """ final options """
     # print(opt)
-    with open(f'./saved_models/{opt.experiment_name}/opt.txt', 'a') as opt_file:
+    with open('./saved_models/{opt.experiment_name}/opt.txt', 'a') as opt_file:
         opt_log = '------------ Options -------------\n'
         args = vars(opt)
         for k, v in args.items():
-            opt_log += f'{str(k)}: {str(v)}\n'
+            opt_log += '{str(k)}: {str(v)}\n'
         opt_log += '---------------------------------------\n'
         print(opt_log)
         opt_file.write(opt_log)
@@ -123,7 +123,7 @@ def train(opt):
     start_iter = 0
     if opt.continue_model != '':
         start_iter = int(opt.continue_model.split('_')[-1].split('.')[0])
-        print(f'continue to train, start_iter: {start_iter}')
+        print('continue to train, start_iter: {start_iter}')
 
     start_time = time.time()
     best_accuracy = -1
@@ -165,10 +165,10 @@ def train(opt):
             # validation part
             if i % opt.valInterval == 0:
                 elapsed_time = time.time() - start_time
-                print(f'[{i}/{opt.num_iter}] Loss: {loss_avg.val():0.5f} elapsed_time: {elapsed_time:0.5f}')
+                print('[{i}/{opt.num_iter}] Loss: {loss_avg.val():0.5f} elapsed_time: {elapsed_time:0.5f}')
                 # for log
-                with open(f'./saved_models/{opt.experiment_name}/log_train.txt', 'a') as log:
-                    log.write(f'[{i}/{opt.num_iter}] Loss: {loss_avg.val():0.5f} elapsed_time: {elapsed_time:0.5f}\n')
+                with open('./saved_models/{opt.experiment_name}/log_train.txt', 'a') as log:
+                    log.write('[{i}/{opt.num_iter}] Loss: {loss_avg.val():0.5f} elapsed_time: {elapsed_time:0.5f}\n')
                     loss_avg.reset()
 
                     model.eval()
@@ -181,29 +181,29 @@ def train(opt):
                         if 'Attn' in opt.Prediction:
                             pred = pred[:pred.find('[s]')]
                             gt = gt[:gt.find('[s]')]
-                        print(f'{pred:20s}, gt: {gt:20s},   {str(pred == gt)}')
-                        log.write(f'{pred:20s}, gt: {gt:20s},   {str(pred == gt)}\n')
+                        print('{pred:20s}, gt: {gt:20s},   {str(pred == gt)}')
+                        log.write('{pred:20s}, gt: {gt:20s},   {str(pred == gt)}\n')
 
-                    valid_log = f'[{i}/{opt.num_iter}] valid loss: {valid_loss:0.5f}'
-                    valid_log += f' accuracy: {current_accuracy:0.3f}, norm_ED: {current_norm_ED:0.2f}'
+                    valid_log = '[{i}/{opt.num_iter}] valid loss: {valid_loss:0.5f}'
+                    valid_log += ' accuracy: {current_accuracy:0.3f}, norm_ED: {current_norm_ED:0.2f}'
                     print(valid_log)
                     log.write(valid_log + '\n')
 
                     # keep best accuracy model
                     if current_accuracy > best_accuracy:
                         best_accuracy = current_accuracy
-                        torch.save(model.state_dict(), f'./saved_models/{opt.experiment_name}/best_accuracy.pth')
+                        torch.save(model.state_dict(), './saved_models/{opt.experiment_name}/best_accuracy.pth')
                     if current_norm_ED < best_norm_ED:
                         best_norm_ED = current_norm_ED
-                        torch.save(model.state_dict(), f'./saved_models/{opt.experiment_name}/best_norm_ED.pth')
-                    best_model_log = f'best_accuracy: {best_accuracy:0.3f}, best_norm_ED: {best_norm_ED:0.2f}'
+                        torch.save(model.state_dict(), './saved_models/{opt.experiment_name}/best_norm_ED.pth')
+                    best_model_log = 'best_accuracy: {best_accuracy:0.3f}, best_norm_ED: {best_norm_ED:0.2f}'
                     print(best_model_log)
                     log.write(best_model_log + '\n')
 
             # save model per 1e+5 iter.
             if (i + 1) % 1e+5 == 0:
                 torch.save(
-                    model.state_dict(), f'./saved_models/{opt.experiment_name}/iter_{i+1}.pth')
+                    model.state_dict(), './saved_models/{opt.experiment_name}/iter_{i+1}.pth')
 
             if i == opt.num_iter:
                 print('end the training')
@@ -251,11 +251,11 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     if not opt.experiment_name:
-        opt.experiment_name = f'{opt.Transformation}-{opt.FeatureExtraction}-{opt.SequenceModeling}-{opt.Prediction}'
-        opt.experiment_name += f'-Seed{opt.manualSeed}'
+        opt.experiment_name = '{opt.Transformation}-{opt.FeatureExtraction}-{opt.SequenceModeling}-{opt.Prediction}'
+        opt.experiment_name += '-Seed{opt.manualSeed}'
         # print(opt.experiment_name)
 
-    os.makedirs(f'./saved_models/{opt.experiment_name}', exist_ok=True)
+    os.makedirs('./saved_models/{opt.experiment_name}', exist_ok=True)
 
     """ Seed and GPU setting """
     # print("Random Seed: ", opt.manualSeed)
